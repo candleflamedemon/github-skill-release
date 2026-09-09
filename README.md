@@ -17,7 +17,9 @@
 - 为目标 skill 构建单独的干净发布树，只包含计划公开的文件。
 - 检查显式绑定的其他 skill，并指导将必要且可公开的说明融合到当前 skill 中。
 - 默认要求 skill 仓库 README 使用中文；用户明确选择时可改为其他语言或双语。
-- 在创建或修改远程仓库前，要求用户选择可见范围、许可证、仓库名、描述、README、`.gitignore`、Issues、Wiki、推送时机和 Release 设置。
+- 在同一轮中同时提供一键推荐方案与所有适用设置的逐项选择题，不能隐藏其中任一部分。
+- 为每项设置说明作用、选项效果和主要风险，标明推荐默认项，并始终保留自定义选项。
+- 用户明确选择的项目优先；用户授权继续但未回答的项目使用已展示的推荐默认值，用户完全未回复时仍会等待。
 - 使用 `scripts/audit_release_tree.py` 检查秘密、隐私、本地绝对路径、临时文件、测试残留和其他不应公开内容。
 - 使用 `scripts/inspect_skill_dependencies.py` 检查 skill 之间的显式绑定和可能依赖。
 - 使用 `scripts/suggest_next_version.py` 根据 `vMAJOR.MINOR.PATCH` 规则建议下一个版本号。
@@ -63,7 +65,7 @@ github-skill-release/
 3. 检查是否绑定其他 skill，并处理必要依赖。
 4. 准备中文 README、许可证、`.gitattributes` 和 `.gitignore`。
 5. 运行安全审计。
-6. 让用户选择 GitHub 仓库和 Release 设置。
+6. 同时展示一键推荐方案和完整逐项选择题，说明推荐理由与风险，并等待用户至少回复一次。
 7. 使用 GitHub CLI 创建或更新仓库。
 8. 发布后核验仓库、文件清单、Release 状态和安全结果。
 
@@ -73,6 +75,18 @@ github-skill-release/
 
 ```text
 请使用 github-skill-release 将 path/to/my-skill 开源到我的 GitHub，并发布 v1.0.0。
+```
+
+设置提问会同时包含两种回答方式：
+
+```text
+R. 一键采用推荐方案（映射：1A 2A 3B ...）
+
+1. 可见范围：A. 公开（推荐） / B. 私有 / C. 组织内部 / D. 自定义
+2. 许可证：A. MIT（推荐） / B. Apache-2.0 / ... / H. 自定义
+...
+
+可回复 R，也可回复 1B 2A 3C；未回答项在用户授权继续后使用已展示的推荐默认值。
 ```
 
 ### 输出
@@ -138,7 +152,7 @@ v1.2.0
 ## 真实能力边界
 
 - 本技能提供的是 Codex 执行安全开源发布时应遵循的流程和辅助脚本。
-- 它不能替用户决定许可证、公开范围或 Release 设置；这些设置必须由用户确认。
+- 它会同时展示推荐方案和逐项选项，不会在展示前替用户决定设置。用户授权继续但省略部分项目时，会使用事先明确标出的推荐默认值；完全没有用户回复时不会执行远程操作。
 - 它不能保证 GitHub、GitHub CLI、网络或账号授权始终可用；遇到授权步骤时需要用户本人完成。
 - 审计脚本是辅助工具，不能替代对发布文件清单和内容的人工确认。
 
@@ -163,7 +177,9 @@ This skill provides a release workflow: build a clean release copy, inspect and 
 - Build a clean release tree for the target skill with only intended public files.
 - Inspect explicit bindings to other skills and guide integration of necessary publishable instructions into the current skill.
 - Default published skill READMEs to Chinese; use another language or bilingual README only when the user chooses it.
-- Ask the user to choose visibility, license, repository name, description, README handling, `.gitignore`, Issues, Wiki, push timing, and Release settings before changing GitHub repository settings.
+- Present a one-click recommended bundle and all applicable per-setting multiple-choice questions together; neither part is hidden behind the other.
+- Explain each setting, option effect, and primary risk, mark the recommended default, and always include a custom option.
+- Honor explicit choices first; after the user authorizes continuation, fill unanswered settings from the displayed defaults, while still waiting if the user has not replied at all.
 - Use `scripts/audit_release_tree.py` to check for secrets, privacy issues, local absolute paths, temporary files, test leftovers, and other non-public content.
 - Use `scripts/inspect_skill_dependencies.py` to detect explicit skill bindings and possible prose dependencies.
 - Use `scripts/suggest_next_version.py` to suggest the next version tag according to `vMAJOR.MINOR.PATCH`.
@@ -209,7 +225,7 @@ A typical workflow includes:
 3. Check whether the package is bound to other skills and handle required dependencies.
 4. Prepare README, license, `.gitattributes`, and `.gitignore`.
 5. Run the safety audit.
-6. Ask the user to choose GitHub repository and Release settings.
+6. Present the recommended bundle and the complete per-setting questions together, explain the rationale and risks, and wait for at least one user reply.
 7. Use GitHub CLI to create or update the repository.
 8. Verify the repository, file list, Release status, and safety result after publishing.
 
@@ -219,6 +235,18 @@ A typical workflow includes:
 
 ```text
 Please use github-skill-release to open-source path/to/my-skill on my GitHub and publish v1.0.0.
+```
+
+The settings prompt supports both response styles at the same time:
+
+```text
+R. Apply the recommended bundle (mapping: 1A 2A 3B ...)
+
+1. Visibility: A. Public (recommended) / B. Private / C. Internal / D. Custom
+2. License: A. MIT (recommended) / B. Apache-2.0 / ... / H. Custom
+...
+
+Reply with R or selections such as 1B 2A 3C. After authorization, unanswered items use the displayed recommended defaults.
 ```
 
 ### Output
@@ -284,6 +312,6 @@ v1.2.0
 ## Real Limitations
 
 - This skill provides a workflow and helper scripts for safe open-source publishing in Codex.
-- It cannot decide the license, visibility, or Release settings for the user; those settings require user confirmation.
+- It presents both recommendations and per-setting choices before acting. After the user authorizes continuation, omitted items use the explicitly displayed defaults; no remote operation runs without any user reply.
 - It cannot guarantee that GitHub, GitHub CLI, network access, or account authorization will always be available.
 - The audit script is a helper and does not replace manual review of the public file list and file contents.

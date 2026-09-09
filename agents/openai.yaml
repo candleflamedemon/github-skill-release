@@ -1,4 +1,4 @@
 interface:
   display_name: "GitHub技能开源发布"
-  short_description: "安全开源、更新并发布 Codex skill"
-  default_prompt: "Use $github-skill-release to safely publish or update this Codex skill on GitHub."
+  short_description: "同时提供推荐方案与逐项选择，安全开源、更新并发布 Codex skill"
+  default_prompt: "Use $github-skill-release to show both a recommended settings bundle and all per-setting choices, then safely publish or update this Codex skill on GitHub."
